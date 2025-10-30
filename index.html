@@ -88,6 +88,16 @@
           <input id="volume" type="range" min="0" max="1" step="0.01" value="1" />
         </div>
       </div>
+      <div class="row">
+        <label>Modo de edición</label>
+        <select id="editMode">
+          <option value="double">Doble toque</option>
+          <option value="long">Pulsación larga</option>
+        </select>
+        <label for="longPressMs">Duración pulsación (ms)</label>
+        <input id="longPressMs" type="range" min="500" max="1500" step="50" value="900" />
+        <span class="help">Sugerido: Doble toque para evitar popups accidentales.</span>
+      </div>
       <div class="row help">Consejo: mantén presionado un botón para editar o borrar.</div>
     </section>
 
@@ -162,6 +172,10 @@ const grid = document.getElementById('grid');
 const tabs = document.getElementById('tabs');
 const cutMode = document.getElementById('cutMode');
 const volume = document.getElementById('volume');
+const editModeSel = document.getElementById('editMode');
+const longPressSlider = document.getElementById('longPressMs');
+let editMode = localStorage.getItem('editMode') || 'double';
+let longPressMs = Number(localStorage.getItem('longPressMs')||900);
 
 function fmtCat(c){return (c&&c.trim())?c.trim():"Sin categoría"}
 
@@ -193,14 +207,7 @@ function renderGrid(){
     const label=document.createElement('div');label.className='label';label.textContent=s.label||'Sin nombre';pad.appendChild(label);
     const hint=document.createElement('small');hint.textContent=fmtCat(s.category);pad.appendChild(hint);
 
-    pad.onpointerdown = ()=> playSound(s, pad);
-    pad.oncontextmenu = (e)=>{e.preventDefault(); openEditor(s)};
-    let pressTimer;
-    pad.onpointerdown = (e)=>{
-      pressTimer = setTimeout(()=>openEditor(s),650);
-      playSound(s,pad);
-    };
-    pad.onpointerup = ()=> clearTimeout(pressTimer);
+    attachPadHandlers(pad, s);
     grid.appendChild(pad);
   });
 }
@@ -223,6 +230,10 @@ function playSound(s, padEl){
     playingNodes.delete(s.id);
     URL.revokeObjectURL(url);
   };
+  audio.play();
+  padEl?.classList.add('playing');
+  playingNodes.set(s.id,audio);
+};
   audio.play();
   padEl?.classList.add('playing');
   playingNodes.set(s.id,audio);
@@ -297,9 +308,43 @@ async function seedInitialPackage(){
   await refresh();
 }
 
+// Gestos en botones (evitar popups accidentales)
+function attachPadHandlers(pad, s){
+  let pressTimer=null; let startX=0,startY=0; let moved=false;
+  pad._lastTap=0;
+  pad.addEventListener('pointerdown',(e)=>{
+    moved=false; startX=e.clientX; startY=e.clientY;
+    // Reproduce en el down para minimizar latencia
+    playSound(s,pad);
+    if(editMode==='long'){
+      pressTimer = setTimeout(()=>{ if(!moved) openEditor(s); }, longPressMs);
+    }
+  });
+  pad.addEventListener('pointermove',(e)=>{
+    if(Math.hypot(e.clientX-startX, e.clientY-startY) > 12){ moved=true; if(pressTimer){clearTimeout(pressTimer);} }
+  });
+  pad.addEventListener('pointerup',()=>{
+    if(pressTimer){ clearTimeout(pressTimer); }
+    if(editMode==='double'){
+      const now=Date.now();
+      if(now - (pad._lastTap||0) < 300){ openEditor(s); pad._lastTap=0; return; }
+      pad._lastTap = now;
+    }
+  });
+  pad.addEventListener('pointercancel',()=>{ if(pressTimer){clearTimeout(pressTimer);} });
+  pad.addEventListener('contextmenu',(e)=> e.preventDefault());
+}
+
 // --- Eventos UI ---
 addEventListener('DOMContentLoaded', async ()=>{
   await openDB();
+  await refresh();
+  cutMode.checked = localStorage.getItem('cutMode')==='1';
+  volume.value = localStorage.getItem('volume')||'1';
+  // cargar ajustes de edición
+  editModeSel.value = editMode;
+  longPressSlider.value = String(longPressMs);
+});
   await refresh();
   cutMode.checked = localStorage.getItem('cutMode')==='1';
   volume.value = localStorage.getItem('volume')||'1';
@@ -346,6 +391,9 @@ volume.oninput=()=>{
 };
 
 cutMode.onchange=()=> localStorage.setItem('cutMode', cutMode.checked?'1':'0');
+
+editModeSel.onchange=()=>{ editMode = editModeSel.value; localStorage.setItem('editMode', editMode); };
+longPressSlider.oninput=()=>{ longPressMs = Number(longPressSlider.value); localStorage.setItem('longPressMs', String(longPressMs)); };
 
 // Exportar / Importar respaldo (JSON, con blobs base64)
 function blobToBase64(blob){
