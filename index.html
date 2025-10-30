@@ -49,7 +49,7 @@
   .vol{display:flex;align-items:center;gap:8px}
   input[type="range"]{width:160px}
   .help{color:#ffffffa8;font-size:12px}
-</style>
+#editMode,#longPressMs,label
 </head>
 <body>
   <div class="wrap">
@@ -176,7 +176,7 @@ const cutMode = document.getElementById('cutMode');
 const volume = document.getElementById('volume');
 const editModeSel = document.getElementById('editMode');
 const longPressSlider = document.getElementById('longPressMs');
-let editMode = localStorage.getItem('editMode') || 'double';
+let editMode = 'double';
 let longPressMs = Number(localStorage.getItem('longPressMs')||900);
 
 function fmtCat(c){return (c&&c.trim())?c.trim():"Sin categoría"}
@@ -223,7 +223,7 @@ function stopAll(){
 }
 
 function playSound(s, padEl){
-  if(cutMode.checked) stopAll();
+  if (cutMode && cutMode.checked) stopAll();
   const url = URL.createObjectURL(s.blob);
   const audio = new Audio(url);
   audio.volume = Number(volume.value||1);
@@ -376,7 +376,7 @@ addEventListener('DOMContentLoaded', async ()=>{
   try{
     await openDB();
     await refresh();
-    cutMode.checked = localStorage.getItem('cutMode')==='1';
+    if (cutMode) { cutMode.checked = localStorage.getItem('cutMode')==='1'; }
     volume.value = localStorage.getItem('volume')||'1';
     // cargar ajustes de edición
     editModeSel.value = editMode;
@@ -389,7 +389,7 @@ addEventListener('DOMContentLoaded', async ()=>{
   }
 });
     await refresh();
-    cutMode.checked = localStorage.getItem('cutMode')==='1';
+    if (cutMode) { cutMode.checked = localStorage.getItem('cutMode')==='1'; }
     volume.value = localStorage.getItem('volume')||'1';
     // cargar ajustes de edición
     editModeSel.value = editMode;
@@ -400,14 +400,14 @@ addEventListener('DOMContentLoaded', async ()=>{
   }
 });
   await refresh();
-  cutMode.checked = localStorage.getItem('cutMode')==='1';
+  if (cutMode) { cutMode.checked = localStorage.getItem('cutMode')==='1'; }
   volume.value = localStorage.getItem('volume')||'1';
   // cargar ajustes de edición
   editModeSel.value = editMode;
   longPressSlider.value = String(longPressMs);
 });
   await refresh();
-  cutMode.checked = localStorage.getItem('cutMode')==='1';
+  if (cutMode) { cutMode.checked = localStorage.getItem('cutMode')==='1'; }
   volume.value = localStorage.getItem('volume')||'1';
 });
 
@@ -451,10 +451,10 @@ volume.oninput=()=>{
   for(const [id,node] of playingNodes){ node.volume = Number(volume.value); }
 };
 
-cutMode.onchange=()=> localStorage.setItem('cutMode', cutMode.checked?'1':'0');
+if (cutMode) { cutMode.onchange=()=> localStorage.setItem('cutMode', cutMode.checked?'1':'0'); }
 
-editModeSel.onchange=()=>{ editMode = editModeSel.value; localStorage.setItem('editMode', editMode); };
-longPressSlider.oninput=()=>{ longPressMs = Number(longPressSlider.value); localStorage.setItem('longPressMs', String(longPressMs)); };
+/* edit mode locked */ localStorage.setItem('editMode', editMode); };
+/* long press disabled */ localStorage.setItem('longPressMs', String(longPressMs)); };
 
 // Exportar / Importar respaldo (JSON, con blobs base64)
 function blobToBase64(blob){
@@ -537,6 +537,16 @@ addEventListener('keydown', async (e)=>{
   }
 });
 
+</script>
+<div id="debugPanel" style="position:fixed;left:8px;right:8px;bottom:calc(var(--footerh) + 8px);background:#111a;border:1px solid #fff2;border-radius:10px;padding:8px;font:12px monospace;color:#fff;display:none;max-height:35vh;overflow:auto;z-index:9999"></div>
+<script>
+  // Mini consola en pantalla para móviles
+  const dbg = document.getElementById('debugPanel');
+  function showDbg(msg){ try{ dbg.style.display='block'; const time=new Date().toLocaleTimeString(); dbg.innerHTML += `<div>[${time}] ${msg}</div>`; dbg.scrollTop = dbg.scrollHeight; }catch(e){} }
+  window.addEventListener('error', (e)=>{ showDbg('ERROR: '+ (e.message||'') + ' @'+ (e.filename||'') + ':' + (e.lineno||'')); });
+  window.addEventListener('unhandledrejection', (e)=>{ showDbg('PROMISE REJECTION: '+ (e.reason && e.reason.message ? e.reason.message : e.reason)); });
+  console.log = ((orig)=> function(){ orig.apply(console, arguments); try{ showDbg('[log] '+ Array.from(arguments).join(' ')); }catch(e){} })(console.log);
+  console.error = ((orig)=> function(){ orig.apply(console, arguments); try{ showDbg('[error] '+ Array.from(arguments).join(' ')); }catch(e){} })(console.error);
 </script>
 </body>
 </html>
