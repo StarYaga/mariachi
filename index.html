@@ -3,57 +3,63 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>Mariachi Soundboard (SAFE MODE)</title>
+<title>Mariachi Soundboard</title>
 <style>
-  :root{
-    --bg:#0b0b0f; --card:#14141a; --accent:#ffd54a; --accent2:#ff6b6b; --text:#f5f5f7; --muted:#9aa0a6;
-  }
+  :root{$1 --footerh:160px;}
   *{box-sizing:border-box}
   html,body{height:100%}
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,sans-serif;background:linear-gradient(160deg,#0b0b0f 0%,#16161d 60%,#0b0b0f 100%);color:var(--text)}
-  .wrap{max-width:900px;margin:0 auto;padding:16px 16px 120px}
+  .wrap{max-width:900px;margin:0 auto;padding:16px 16px calc(var(--footerh) + 24px)}
   header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .logo{
+    width:42px;height:42px;border-radius:12px;background:radial-gradient(circle at 30% 30%,#fff 0,#ffd54a 20%,#ff6b6b 40%,#0000 41%), #222;
+    display:grid;place-items:center;box-shadow:0 8px 28px #0008;position:relative
+  }
+  .logo::after{content:"";position:absolute;inset:2px;border-radius:10px;border:1px solid #ffffff18}
   h1{font-size:22px;margin:0}
-  .help{color:#ffffffa8;font-size:12px}
+  .badge{font-size:12px;color:var(--bg);background:var(--accent);padding:4px 8px;border-radius:999px;font-weight:700}
   .controls{margin:12px 0;padding:12px;background:var(--card);border-radius:16px;border:1px solid #ffffff14;display:grid;gap:10px}
   .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  label{font-size:13px;color:var(--muted)}
   input[type="text"], select{background:#1b1b24;border:1px solid #2a2a34;color:var(--text);padding:10px 12px;border-radius:12px;min-width:120px}
-  input[type="file"]{accent-color:var(--accent)}
   input[type="color"]{border:none;background:#1b1b24;width:44px;height:40px;border-radius:12px}
+  input[type="file"]{accent-color:var(--accent)}
+  .toggle{display:flex;gap:8px;align-items:center}
   .tabs{display:flex;gap:8px;overflow:auto;padding-bottom:6px}
   .tab{padding:8px 12px;border-radius:999px;background:#1b1b24;border:1px solid #2a2a34;color:var(--muted);white-space:nowrap;cursor:pointer}
   .tab.active{background:var(--accent);color:#1a1200;border-color:#0000;font-weight:700}
   .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
   @media(min-width:560px){.grid{grid-template-columns:repeat(3,1fr)}}
   @media(min-width:820px){.grid{grid-template-columns:repeat(4,1fr)}}
-
-  .pad{
-    position:relative;isolation:isolate;background:#1b1b24;border:1px solid #2a2a34;border-radius:18px;
-    padding:16px;min-height:86px;display:flex;align-items:center;justify-content:center;overflow:hidden;
-    cursor:pointer;box-shadow:0 6px 18px #0006;text-align:center
-  }
-  .pad .label{font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#ffffff;font-size:14px;text-align:center}
+  .pad{position:relative;isolation:isolate;background:#1b1b24;border:1px solid #2a2a34;border-radius:18px;padding:16px;min-height:86px;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;box-shadow:0 6px 18px #0006;text-align:center}
+  .pad .label{font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#ffffff;font-size:14px;text-align:center}}
   .pad small{position:absolute;top:8px;right:10px;color:#ffffff88;font-size:10px}
+  .pad:active{transform:translateY(1px)}
   .pad .bg{position:absolute;inset:0;opacity:.16}
   .pad.playing{outline:2px solid var(--accent);box-shadow:0 0 0 3px #0008}
-
-  .footerBar{position:fixed;left:0;right:0;bottom:0;background:linear-gradient( to top, #0b0b0f, #0b0b0fee 40%, transparent );padding:12px}
+  .muted{opacity:.6}
+  .footerBar{position:fixed;left:0;right:0;bottom:0;background:linear-gradient( to top, #0b0b0f, #0b0b0fee 40%, transparent );padding:12px;transition:transform .25s ease, opacity .25s ease;will-change:transform}
+.footerBar.collapsed{transform:translateY(calc(100% - 34px));opacity:.95}
+.footerBar .toggleDock{margin-left:auto}
   .footer{max-width:900px;margin:0 auto;background:var(--card);border:1px solid #ffffff14;border-radius:16px;padding:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .btn{background:#232332;border:1px solid #2a2a34;color:var(--text);padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer}
   .btn.primary{background:var(--accent);color:#1a1200;border-color:#0000}
   .btn.danger{background:var(--accent2);color:#1a0000;border-color:#0000}
+  .btn.ghost{background:#1b1b24}
   .vol{display:flex;align-items:center;gap:8px}
   input[type="range"]{width:160px}
+  .help{color:#ffffffa8;font-size:12px}
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <h1>Mariachi Soundboard — SAFE</h1>
-      <div class="help">Si algo no aparece, toca “Reset app” y recarga.</div>
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <h1>Mariachi Soundboard</h1>
+        <div class="help">Carga tus gritos y frases, guarda en el celular y úsalos en vivo.</div>
+      </div>
+      <span class="badge">Offline-ready</span>
     </header>
 
     <section class="controls" aria-label="Agregar sonido">
@@ -70,19 +76,29 @@
       </div>
       <div class="row">
         <button id="seed50" class="btn primary">📦 Cargar paquete inicial (50)</button>
-        <span class="help">Se crean 50 botones de ejemplo por categorías.</span>
+        <span class="help">Crea 50 botones de ejemplo en: Cumpleaños, Brindis, Torta, Despedida, Saludo.</span>
       </div>
       <div class="row">
-        <label>Edición</label>
+        <div class="toggle">
+          <input type="checkbox" id="cutMode" />
+          <label for="cutMode">Cortar el sonido anterior al reproducir</label>
+        </div>
+        <div class="vol">
+          <label for="volume">Volumen</label>
+          <input id="volume" type="range" min="0" max="1" step="0.01" value="1" />
+        </div>
+      </div>
+      <div class="row">
+        <label>Modo de edición</label>
         <select id="editMode">
-          <option value="double" selected>Doble toque</option>
+          <option value="double">Doble toque</option>
           <option value="long">Pulsación larga</option>
         </select>
-        <label for="longPressMs">Duración (ms)</label>
+        <label for="longPressMs">Duración pulsación (ms)</label>
         <input id="longPressMs" type="range" min="500" max="1500" step="50" value="900" />
-        <div class="vol"><label for="volume">Volumen</label><input id="volume" type="range" min="0" max="1" step="0.01" value="1" /></div>
+        <span class="help">Sugerido: Doble toque para evitar popups accidentales.</span>
       </div>
-      <div class="row"><span class="help">Sugerido: Doble toque para editar. Arriba verás errores si algo falla.</span></div>
+      <div class="row help">Consejo: mantén presionado un botón para editar o borrar.</div>
     </section>
 
     <nav class="tabs" id="tabs"></nav>
@@ -91,22 +107,21 @@
 
   <div class="footerBar">
     <div class="footer">
-      <button id="stopAll" class="btn danger">⛔ STOP TODO</button>
-      <button id="exportBtn" class="btn">💾 Exportar respaldo</button>
-      <button id="importBackupBtn" class="btn">📥 Importar respaldo</button>
+      <button id="toggleFooter" class="btn toggleDock">🔽 Ocultar barra</button>
       <button id="resetApp" class="btn">🧹 Reset app (cache + DB)</button>
+      <button id="stopAll" class="btn danger">⛔ STOP TODO</button>
+      <button id="exportBtn" class="btn ghost">💾 Exportar respaldo</button>
+      <button id="importBackupBtn" class="btn ghost">📥 Importar respaldo</button>
+      <span class="help">Funciona sin internet • Guarda en tu equipo</span>
       <input id="backupFile" type="file" accept="application/json" hidden />
     </div>
-  </div>
+</div>
 
 <script>
+// --- Utilidades IndexedDB muy simples ---
 const DB_NAME = 'mariachi-soundboard-v1';
 const STORE = 'sounds';
 let db;
-
-function log(...a){ console.log('[SB]', ...a); }
-function err(...a){ console.error('[SB]', ...a); alert('Error: revisa la consola del navegador'); }
-
 function openDB(){
   return new Promise((resolve,reject)=>{
     const req = indexedDB.open(DB_NAME,1);
@@ -135,6 +150,13 @@ function updateSound(rec){
     tx.onerror=()=>reject(tx.error);
   });
 }
+function deleteSound(id){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).delete(id).onsuccess=()=>resolve();
+    tx.onerror=()=>reject(tx.error);
+  });
+}
 function getAll(){
   return new Promise((resolve,reject)=>{
     const tx=db.transaction(STORE,'readonly');
@@ -143,29 +165,14 @@ function getAll(){
     req.onerror=()=>reject(req.error);
   });
 }
-function makeSilentWav(durationSec=0.5, sampleRate=44100){
-  const numSamples = Math.floor(durationSec*sampleRate);
-  const bytesPerSample = 2; const numChannels = 1;
-  const blockAlign = numChannels*bytesPerSample;
-  const byteRate = sampleRate*blockAlign;
-  const dataSize = numSamples*blockAlign;
-  const buffer = new ArrayBuffer(44+dataSize);
-  const view = new DataView(buffer);
-  let o=0;
-  function wstr(s){ for(let i=0;i<s.length;i++) view.setUint8(o++, s.charCodeAt(i)); }
-  function w32(v){ view.setUint32(o, v, true); o+=4; }
-  function w16(v){ view.setUint16(o, v, true); o+=2; }
-  wstr('RIFF'); w32(36+dataSize); wstr('WAVE');
-  wstr('fmt '); w32(16); w16(1); w16(numChannels); w32(sampleRate); w32(byteRate); w16(blockAlign); w16(bytesPerSample*8);
-  wstr('data'); w32(dataSize);
-  for(let i=0;i<numSamples;i++){ view.setInt16(o, 0, true); o+=2; }
-  return new Blob([buffer], {type:'audio/wav'});
-}
 
-let SOUNDS=[]; let currentTab='Todas'; let playingNodes=new Map();
+// --- Estado UI ---
+let SOUNDS=[]; // {id,label,category,color,blob}
+let currentTab='Todas';
+let playingNodes=new Map();
 const grid = document.getElementById('grid');
 const tabs = document.getElementById('tabs');
-const cutMode = document.getElementById('cutMode'); // (podría no existir en esta SAFE)
+const cutMode = document.getElementById('cutMode');
 const volume = document.getElementById('volume');
 const editModeSel = document.getElementById('editMode');
 const longPressSlider = document.getElementById('longPressMs');
@@ -184,11 +191,158 @@ function renderTabs(){
     tabs.appendChild(el);
   });
 }
+
+function renderGrid(){
+  grid.innerHTML='';
+  const items = SOUNDS.filter(s=> currentTab==='Todas' || fmtCat(s.category)===currentTab );
+  if(!items.length){
+    const p=document.createElement('p');
+    p.className='help';
+    p.textContent='No hay sonidos en esta pestaña. Agrega con el botón de arriba.';
+    grid.appendChild(p);return;
+  }
+  items.forEach(s=>{
+    const pad=document.createElement('button');
+    pad.className='pad';
+    pad.style.backgroundColor = '#1b1b24';
+    const tint=document.createElement('div');tint.className='bg';tint.style.background=s.color||'#ffd54a';pad.appendChild(tint);
+    const label=document.createElement('div');label.className='label';label.textContent=s.label||'Sin nombre';pad.appendChild(label);
+    const hint=document.createElement('small');hint.textContent=fmtCat(s.category);pad.appendChild(hint);
+
+    attachPadHandlers(pad, s);
+    grid.appendChild(pad);
+  });
+}
+
+function stopAll(){
+  for(const [id,node] of playingNodes){
+    try{node.pause(); node.currentTime=0;}catch{}
+  }
+  playingNodes.clear();
+  document.querySelectorAll('.pad.playing').forEach(el=>el.classList.remove('playing'));
+}
+
+function playSound(s, padEl){
+  if(cutMode.checked) stopAll();
+  const url = URL.createObjectURL(s.blob);
+  const audio = new Audio(url);
+  audio.volume = Number(volume.value||1);
+  audio.onended = ()=>{
+    padEl?.classList.remove('playing');
+    playingNodes.delete(s.id);
+    URL.revokeObjectURL(url);
+  };
+  audio.play();
+  padEl?.classList.add('playing');
+  playingNodes.set(s.id,audio);
+};
+  audio.play();
+  padEl?.classList.add('playing');
+  playingNodes.set(s.id,audio);
+}
+
+async function openEditor(s){
+  const newLabel = prompt('Editar etiqueta', s.label||'');
+  if(newLabel===null) return; // cancel
+  const newCat = prompt('Editar categoría', s.category||'');
+  const newColor = prompt('Editar color (hex, ej. #ffcc33)', s.color||'#ffcc33');
+  s.label=newLabel; s.category=newCat; s.color=newColor;
+  await updateSound(s); await refresh();
+}
+
+// --- Utilidades WAV de silencio ---
+function makeSilentWav(durationSec=0.5, sampleRate=44100){
+  const numSamples = Math.floor(durationSec*sampleRate);
+  const bytesPerSample = 2; // PCM16
+  const numChannels = 1;
+  const blockAlign = numChannels*bytesPerSample;
+  const byteRate = sampleRate*blockAlign;
+  const dataSize = numSamples*blockAlign;
+  const buffer = new ArrayBuffer(44+dataSize);
+  const view = new DataView(buffer);
+  let o=0;
+  function writeStr(s){ for(let i=0;i<s.length;i++) view.setUint8(o++, s.charCodeAt(i)); }
+  function write32(v){ view.setUint32(o, v, true); o+=4; }
+  function write16(v){ view.setUint16(o, v, true); o+=2; }
+  // RIFF header
+  writeStr('RIFF'); write32(36+dataSize); writeStr('WAVE');
+  // fmt chunk
+  writeStr('fmt '); write32(16); write16(1); write16(numChannels); write32(sampleRate); write32(byteRate); write16(blockAlign); write16(bytesPerSample*8);
+  // data chunk
+  writeStr('data'); write32(dataSize);
+  // samples (silence = 0)
+  for(let i=0;i<numSamples;i++){ view.setInt16(o, 0, true); o+=2; }
+  return new Blob([buffer], {type:'audio/wav'});
+}
+
+async function seedInitialPackage(){
+  try{
+    console.log('[seed50] start');
+    const existing = await getAll();
+    if(existing.length>0){
+      if(!confirm('Ya tienes sonidos guardados. ¿Agregar también el paquete inicial (50)?')) return;
+    }
+    const silent = makeSilentWav(0.5);
+    const addMany = async (labels, category, color)=>{
+      for(const label of labels){
+        await addSound({label, category, color, blob: silent, createdAt: Date.now()});
+      }
+    };
+    const cumple = ['¡Sorpresa!','¡Que viva la cumpleañera!','¡Que viva el cumpleañero!','¡Un aplauso fuerte!','¡Otra, otra!','¡Foto, foto!','¡Que cante! ¡Que cante!','¡Beso, beso!','¡Apaguen las velas!','¡Feliz cumpleaños!'];
+    const brindis = ['¡Salud!','Arriba, abajo, al centro y pa’ dentro','¡Trago bendito!','¡Brindis por los novios!','¡Brindis por la cumpleañera!','¡Que se escuche ese salud!','¡Todos con sus copas!','¡Salud, salud, salud!','¡No se me escondan!','¡A la una, a las dos y a las tres!'];
+    const torta = ['¡Que muerda la torta!','¡Muerde, muerde!','¡Corten la torta!','¡Que salga la torta!','¡Foto con la torta!','¡Aplaudan la torta!','¡Que soplen la vela!','¡Prendan la vela!','¡La mordida! ¡La mordida!','¡Que repartan la torta!'];
+    const despedida = ['¡Gracias por su cariño!','¡Han sido un público hermoso!','¡Hasta pronto!','¡Nos vemos, familia bonita!','¡Buenas noches!','¡Gracias por invitarnos!','¡Viva el amor!','¡Viva la festejada!','¡Se despiden Los Coyotes!','¡Hasta la próxima fiesta!'];
+    const saludo = ['¡Muy buenas noches!','¡Bienvenidos!','¡Cómo está mi gente bonita!','¡Arriba las palmas!','¡Aplauso para los anfitriones!','¡Fuerte ese grito!','¡Listos para cantar!','¡Llegó el mariachi!','¡Somos Los Coyotes!','¡Ajusten las gargantas!'];
+    await addMany(cumple,'Cumpleaños','#ffcc33');
+    await addMany(brindis,'Brindis','#72e5ff');
+    await addMany(torta,'Torta','#ff6b6b');
+    await addMany(despedida,'Despedida','#a78bfa');
+    await addMany(saludo,'Saludo','#34d399');
+    alert('Paquete inicial (50) agregado. Ahora puedes editar cada botón y sustituir el audio por el tuyo.');
+    await refresh();
+    console.log('[seed50] done');
+  }catch(err){
+    console.error('[seed50] error', err);
+    alert('No se pudo cargar el paquete inicial. Detalle en consola.');
+  }
+}
+  const silent = makeSilentWav(0.5);
+  const addMany = async (labels, category, color)=>{
+    for(const label of labels){
+      await addSound({label, category, color, blob: silent, createdAt: Date.now()});
+    }
+  };
+  const cumple = [
+    '¡Sorpresa!','¡Que viva la cumpleañera!','¡Que viva el cumpleañero!','¡Un aplauso fuerte!','¡Otra, otra!','¡Foto, foto!','¡Que cante! ¡Que cante!','¡Beso, beso!','¡Apaguen las velas!','¡Feliz cumpleaños!'
+  ];
+  const brindis = [
+    '¡Salud!','Arriba, abajo, al centro y pa’ dentro','¡Trago bendito!','¡Brindis por los novios!','¡Brindis por la cumpleañera!','¡Que se escuche ese salud!','¡Todos con sus copas!','¡Salud, salud, salud!','¡No se me escondan!','¡A la una, a las dos y a las tres!'
+  ];
+  const torta = [
+    '¡Que muerda la torta!','¡Muerde, muerde!','¡Corten la torta!','¡Que salga la torta!','¡Foto con la torta!','¡Aplaudan la torta!','¡Que soplen la vela!','¡Prendan la vela!','¡La mordida! ¡La mordida!','¡Que repartan la torta!'
+  ];
+  const despedida = [
+    '¡Gracias por su cariño!','¡Han sido un público hermoso!','¡Hasta pronto!','¡Nos vemos, familia bonita!','¡Buenas noches!','¡Gracias por invitarnos!','¡Viva el amor!','¡Viva la festejada!','¡Se despiden Los Coyotes!','¡Hasta la próxima fiesta!'
+  ];
+  const saludo = [
+    '¡Muy buenas noches!','¡Bienvenidos!','¡Cómo está mi gente bonita!','¡Arriba las palmas!','¡Aplauso para los anfitriones!','¡Fuerte ese grito!','¡Listos para cantar!','¡Llegó el mariachi!','¡Somos Los Coyotes!','¡Ajusten las gargantas!'
+  ];
+  await addMany(cumple,'Cumpleaños','#ffcc33');
+  await addMany(brindis,'Brindis','#72e5ff');
+  await addMany(torta,'Torta','#ff6b6b');
+  await addMany(despedida,'Despedida','#a78bfa');
+  await addMany(saludo,'Saludo','#34d399');
+  alert('Paquete inicial (50) agregado. Ahora puedes editar cada botón y sustituir el audio por el tuyo.');
+  await refresh();
+}
+
+// Gestos en botones (evitar popups accidentales)
 function attachPadHandlers(pad, s){
   let pressTimer=null; let startX=0,startY=0; let moved=false;
   pad._lastTap=0;
   pad.addEventListener('pointerdown',(e)=>{
     moved=false; startX=e.clientX; startY=e.clientY;
+    // Reproduce en el down para minimizar latencia
     playSound(s,pad);
     if(editMode==='long'){
       pressTimer = setTimeout(()=>{ if(!moved) openEditor(s); }, longPressMs);
@@ -208,104 +362,135 @@ function attachPadHandlers(pad, s){
   pad.addEventListener('pointercancel',()=>{ if(pressTimer){clearTimeout(pressTimer);} });
   pad.addEventListener('contextmenu',(e)=> e.preventDefault());
 }
-function renderGrid(){
-  grid.innerHTML='';
-  const items = SOUNDS.filter(s=> currentTab==='Todas' || fmtCat(s.category)===currentTab );
-  if(!items.length){
-    const p=document.createElement('p'); p.className='help'; p.textContent='No hay sonidos. Agrega con el botón de arriba.';
-    grid.appendChild(p);return;
-  }
-  items.forEach(s=>{
-    const pad=document.createElement('button');
-    pad.className='pad';
-    const tint=document.createElement('div');tint.className='bg';tint.style.background=s.color||'#ffd54a';pad.appendChild(tint);
-    const label=document.createElement('div');label.className='label';label.textContent=s.label||'Sin nombre';pad.appendChild(label);
-    const hint=document.createElement('small');hint.textContent=fmtCat(s.category);pad.appendChild(hint);
-    attachPadHandlers(pad, s);
-    grid.appendChild(pad);
-  });
-}
-function stopAll(){
-  for(const [,node] of playingNodes){ try{node.pause(); node.currentTime=0;}catch{} }
-  playingNodes.clear(); document.querySelectorAll('.pad.playing').forEach(el=>el.classList.remove('playing'));
-}
-function playSound(s, padEl){
-  const url = URL.createObjectURL(s.blob);
-  const audio = new Audio(url);
-  audio.volume = Number(volume.value||1);
-  audio.onended = ()=>{ padEl?.classList.remove('playing'); playingNodes.delete(s.id); URL.revokeObjectURL(url); };
-  audio.play().catch(e=>err('No se pudo reproducir', e));
-  padEl?.classList.add('playing'); playingNodes.set(s.id,audio);
-}
-async function openEditor(s){
-  const newLabel = prompt('Editar etiqueta', s.label||''); if(newLabel===null) return;
-  const newCat = prompt('Editar categoría', s.category||'');
-  const newColor = prompt('Editar color (hex, ej. #ffcc33)', s.color||'#ffcc33');
-  s.label=newLabel; s.category=newCat; s.color=newColor;
-  await updateSound(s); await refresh();
+
+// --- Utilidades de layout ---
+function setFooterPadding(){
+  const fb=document.querySelector('.footerBar');
+  if(!fb) return;
+  const h = fb.getBoundingClientRect().height || 160;
+  document.documentElement.style.setProperty('--footerh', Math.ceil(h)+'px');
 }
 
-async function refresh(){
+// --- Eventos UI ---
+addEventListener('DOMContentLoaded', async ()=>{
   try{
-    SOUNDS = await getAll();
-    renderTabs(); renderGrid();
-    log('refresh OK, items:', SOUNDS.length);
-  }catch(e){ err('refresh error', e); }
+    await openDB();
+    await refresh();
+    cutMode.checked = localStorage.getItem('cutMode')==='1';
+    volume.value = localStorage.getItem('volume')||'1';
+    // cargar ajustes de edición
+    editModeSel.value = editMode;
+    longPressSlider.value = String(longPressMs);
+    setFooterPadding();
+    addEventListener('resize', setFooterPadding);
+  }catch(err){
+    console.error('[init] error', err);
+    alert('Hubo un problema inicializando la app. Prueba el botón "Reset app".');
+  }
+});
+    await refresh();
+    cutMode.checked = localStorage.getItem('cutMode')==='1';
+    volume.value = localStorage.getItem('volume')||'1';
+    // cargar ajustes de edición
+    editModeSel.value = editMode;
+    longPressSlider.value = String(longPressMs);
+  }catch(err){
+    console.error('[init] error', err);
+    alert('Hubo un problema inicializando la app. Prueba el botón "Reset app".');
+  }
+});
+  await refresh();
+  cutMode.checked = localStorage.getItem('cutMode')==='1';
+  volume.value = localStorage.getItem('volume')||'1';
+  // cargar ajustes de edición
+  editModeSel.value = editMode;
+  longPressSlider.value = String(longPressMs);
+});
+  await refresh();
+  cutMode.checked = localStorage.getItem('cutMode')==='1';
+  volume.value = localStorage.getItem('volume')||'1';
+});
+
+async function refresh(){
+  SOUNDS = await getAll();
+  renderTabs();
+  renderGrid();
 }
 
 document.getElementById('addBtn').onclick = async ()=>{
-  try{
-    const f = document.getElementById('fileInput').files?.[0];
-    if(!f){alert('Selecciona un archivo de audio');return}
-    const rec={
-      label: document.getElementById('labelInput').value||f.name.replace(/\.[^.]+$/,''),
-      category: document.getElementById('categoryInput').value||'Gritos',
-      color: document.getElementById('colorInput').value||'#ffcc33',
-      blob: new Blob([await f.arrayBuffer()], {type:f.type||'audio/mpeg'}),
-      createdAt: Date.now()
-    };
-    await addSound(rec);
-    document.getElementById('fileInput').value='';
-    await refresh();
-  }catch(e){ err('addBtn error', e); }
+  const f = document.getElementById('fileInput').files?.[0];
+  if(!f){alert('Selecciona un archivo de audio');return}
+  const rec={
+    label: document.getElementById('labelInput').value||f.name.replace(/\.[^.]+$/,''),
+    category: document.getElementById('categoryInput').value||'Gritos',
+    color: document.getElementById('colorInput').value||'#ffcc33',
+    blob: new Blob([await f.arrayBuffer()], {type:f.type||'audio/mpeg'}),
+    createdAt: Date.now()
+  };
+  await addSound(rec);
+  document.getElementById('fileInput').value='';
+  await refresh();
 };
 
 document.getElementById('importBtn').onclick=()=>document.getElementById('importFiles').click();
 document.getElementById('importFiles').onchange=async (e)=>{
-  try{
-    const files=Array.from(e.target.files||[]);
-    for(const f of files){
-      const rec={label:f.name.replace(/\.[^.]+$/,''),category:'Importados',color:'#72e5ff',blob:new Blob([await f.arrayBuffer()],{type:f.type||'audio/mpeg'}),createdAt:Date.now()};
-      await addSound(rec);
-    }
-    e.target.value='';
-    await refresh();
-  }catch(ex){ err('importFiles error', ex); }
+  const files=Array.from(e.target.files||[]);
+  for(const f of files){
+    const rec={label:f.name.replace(/\.[^.]+$/,''),category:'Importados',color:'#72e5ff',blob:new Blob([await f.arrayBuffer()],{type:f.type||'audio/mpeg'}),createdAt:Date.now()};
+    await addSound(rec);
+  }
+  e.target.value='';
+  await refresh();
 };
 
-document.getElementById('seed50').onclick=async ()=>{
-  try{
-    const existing = await getAll();
-    if(existing.length>0){ if(!confirm('Ya tienes sonidos guardados. ¿Agregar también el paquete inicial (50)?')) return; }
-    const silent = makeSilentWav(0.3);
-    const addMany = async (labels, category, color)=>{ for(const label of labels){ await addSound({label, category, color, blob: silent, createdAt: Date.now()}); } };
-    const cumple = ['¡Sorpresa!','¡Que viva la cumpleañera!','¡Que viva el cumpleañero!','¡Un aplauso fuerte!','¡Otra, otra!','¡Foto, foto!','¡Que cante! ¡Que cante!','¡Beso, beso!','¡Apaguen las velas!','¡Feliz cumpleaños!'];
-    const brindis = ['¡Salud!','Arriba, abajo, al centro y pa’ dentro','¡Trago bendito!','¡Brindis por los novios!','¡Brindis por la cumpleañera!','¡Que se escuche ese salud!','¡Todos con sus copas!','¡Salud, salud, salud!','¡No se me escondan!','¡A la una, a las dos y a las tres!'];
-    const torta = ['¡Que muerda la torta!','¡Muerde, muerde!','¡Corten la torta!','¡Que salga la torta!','¡Foto con la torta!','¡Aplaudan la torta!','¡Que soplen la vela!','¡Prendan la vela!','¡La mordida! ¡La mordida!','¡Que repartan la torta!'];
-    const despedida = ['¡Gracias por su cariño!','¡Han sido un público hermoso!','¡Hasta pronto!','¡Nos vemos, familia bonita!','¡Buenas noches!','¡Gracias por invitarnos!','¡Viva el amor!','¡Viva la festejada!','¡Se despiden Los Coyotes!','¡Hasta la próxima fiesta!'];
-    const saludo = ['¡Muy buenas noches!','¡Bienvenidos!','¡Cómo está mi gente bonita!','¡Arriba las palmas!','¡Aplauso para los anfitriones!','¡Fuerte ese grito!','¡Listos para cantar!','¡Llegó el mariachi!','¡Somos Los Coyotes!','¡Ajusten las gargantas!'];
-    await addMany(cumple,'Cumpleaños','#ffcc33');
-    await addMany(brindis,'Brindis','#72e5ff');
-    await addMany(torta,'Torta','#ff6b6b');
-    await addMany(despedida,'Despedida','#a78bfa');
-    await addMany(saludo,'Saludo','#34d399');
-    await refresh();
-    alert('Paquete inicial (50) agregado ✅');
-  }catch(e){ err('seed50 error', e); }
+document.getElementById('stopAll').onclick=stopAll;
+
+volume.oninput=()=>{
+  localStorage.setItem('volume', volume.value);
+  // Actualiza volumen de los que estén sonando
+  for(const [id,node] of playingNodes){ node.volume = Number(volume.value); }
 };
+
+cutMode.onchange=()=> localStorage.setItem('cutMode', cutMode.checked?'1':'0');
+
+editModeSel.onchange=()=>{ editMode = editModeSel.value; localStorage.setItem('editMode', editMode); };
+longPressSlider.oninput=()=>{ longPressMs = Number(longPressSlider.value); localStorage.setItem('longPressMs', String(longPressMs)); };
+
+// Exportar / Importar respaldo (JSON, con blobs base64)
+function blobToBase64(blob){
+  return new Promise((resolve)=>{
+    const r=new FileReader(); r.onload=()=>resolve(r.result); r.readAsDataURL(blob);
+  });
+}
+
+async function exportBackup(){
+  const data = await getAll();
+  const items=[];
+  for(const s of data){
+    items.push({id:s.id,label:s.label,category:s.category,color:s.color,createdAt:s.createdAt, data: await blobToBase64(s.blob)});
+  }
+  const json = JSON.stringify({version:1, items});
+  const blob = new Blob([json], {type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='mariachi-soundboard-backup.json';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
 
 document.getElementById('exportBtn').onclick=exportBackup;
+document.getElementById('seed50').onclick=seedInitialPackage;
+document.getElementById('resetApp').onclick=resetApp;
+const toggleFooterBtn = document.getElementById('toggleFooter');
+const footerBarEl = document.querySelector('.footerBar');
+toggleFooterBtn.onclick = ()=>{
+  footerBarEl.classList.toggle('collapsed');
+  toggleFooterBtn.textContent = footerBarEl.classList.contains('collapsed') ? '🔼 Mostrar barra' : '🔽 Ocultar barra';
+  setFooterPadding();
+};
+
 document.getElementById('importBackupBtn').onclick=()=>document.getElementById('backupFile').click();
+
 document.getElementById('backupFile').onchange=async (e)=>{
   const f=e.target.files?.[0]; if(!f) return;
   const txt=await f.text();
@@ -315,56 +500,43 @@ document.getElementById('backupFile').onchange=async (e)=>{
       await addSound({label:it.label,category:it.category,color:it.color,blob,createdAt:it.createdAt||Date.now()});
     }
     await refresh(); alert('Respaldo importado');
-  }catch(er){ err('import backup error', er); }
+  }catch(err){ alert('No se pudo importar el respaldo'); }
   e.target.value='';
 };
 
-async function exportBackup(){
-  const data = await getAll();
-  const items=[];
-  for(const s of data){ items.push({id:s.id,label:s.label,category:s.category,color:s.color,createdAt:s.createdAt, data: await blobToBase64(s.blob)}); }
-  const json = JSON.stringify({version:1, items});
-  const blob = new Blob([json], {type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob); a.download='mariachi-soundboard-backup.json'; a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
-}
-function blobToBase64(blob){
-  return new Promise((resolve)=>{
-    const r=new FileReader(); r.onload=()=>resolve(r.result); r.readAsDataURL(blob);
-  });
-}
-
-document.getElementById('stopAll').onclick=stopAll;
-
-document.getElementById('resetApp').onclick=async ()=>{
+async function resetApp(){
   try{
+    // 1) Cerrar y borrar IndexedDB
     if(db){ db.close && db.close(); }
-    await new Promise((res)=>{ const del = indexedDB.deleteDatabase(DB_NAME); del.onsuccess=()=>res(); del.onerror=()=>res(); del.onblocked=()=>res(); });
-    if('caches' in self){ const keys = await caches.keys(); await Promise.all(keys.map(k=>caches.delete(k))); }
-    if('serviceWorker' in navigator){ const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r=>r.unregister())); }
+    await new Promise((res,rej)=>{
+      const del = indexedDB.deleteDatabase('mariachi-soundboard-v1');
+      del.onsuccess=()=>res(); del.onerror=()=>res(); del.onblocked=()=>res();
+    });
+    // 2) Limpiar caches (Service Worker)
+    if('caches' in self){
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k=>caches.delete(k)));
+    }
+    // 3) Desregistrar SW
+    if('serviceWorker' in navigator){
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r=>r.unregister()));
+    }
     alert('App reseteada. Se recargará.');
     location.reload();
-  }catch(e){ err('reset error', e); }
-};
-
-window.addEventListener('load', async ()=>{
-  try{
-    await openDB(); await refresh();
-    editModeSel.value = editMode; longPressSlider.value = String(longPressMs);
-  }catch(e){ err('init load error', e); }
-});
-editModeSel.onchange=()=>{ editMode = editModeSel.value; localStorage.setItem('editMode', editMode); };
-longPressSlider.oninput=()=>{ longPressMs = Number(longPressSlider.value); localStorage.setItem('longPressMs', String(longPressMs)); };
-</script>
-
-<!-- Registro del SW (no falla si no existe) -->
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(()=>{});
-  });
+  }catch(err){
+    console.error('[resetApp] error', err);
+    alert('No se pudo resetear completamente. Intenta cerrar todas las pestañas y abrir de nuevo.');
+  }
 }
+
+// Borrar con confirmación desde editor de prompt (long-press abre editor, pero agregamos atajo)
+addEventListener('keydown', async (e)=>{
+  if(e.key==='Delete'){
+    // no global delete por seguridad
+  }
+});
+
 </script>
 </body>
 </html>
