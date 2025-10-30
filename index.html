@@ -107,6 +107,7 @@
 
   <div class="footerBar">
     <div class="footer">
+      <button id="resetApp" class="btn">🧹 Reset app (cache + DB)</button>
       <button id="stopAll" class="btn danger">⛔ STOP TODO</button>
       <button id="exportBtn" class="btn ghost">💾 Exportar respaldo</button>
       <button id="importBackupBtn" class="btn ghost">📥 Importar respaldo</button>
@@ -274,10 +275,36 @@ function makeSilentWav(durationSec=0.5, sampleRate=44100){
 }
 
 async function seedInitialPackage(){
-  const existing = await getAll();
-  if(existing.length>0){
-    if(!confirm('Ya tienes sonidos guardados. ¿Agregar también el paquete inicial (50)?')) return;
+  try{
+    console.log('[seed50] start');
+    const existing = await getAll();
+    if(existing.length>0){
+      if(!confirm('Ya tienes sonidos guardados. ¿Agregar también el paquete inicial (50)?')) return;
+    }
+    const silent = makeSilentWav(0.5);
+    const addMany = async (labels, category, color)=>{
+      for(const label of labels){
+        await addSound({label, category, color, blob: silent, createdAt: Date.now()});
+      }
+    };
+    const cumple = ['¡Sorpresa!','¡Que viva la cumpleañera!','¡Que viva el cumpleañero!','¡Un aplauso fuerte!','¡Otra, otra!','¡Foto, foto!','¡Que cante! ¡Que cante!','¡Beso, beso!','¡Apaguen las velas!','¡Feliz cumpleaños!'];
+    const brindis = ['¡Salud!','Arriba, abajo, al centro y pa’ dentro','¡Trago bendito!','¡Brindis por los novios!','¡Brindis por la cumpleañera!','¡Que se escuche ese salud!','¡Todos con sus copas!','¡Salud, salud, salud!','¡No se me escondan!','¡A la una, a las dos y a las tres!'];
+    const torta = ['¡Que muerda la torta!','¡Muerde, muerde!','¡Corten la torta!','¡Que salga la torta!','¡Foto con la torta!','¡Aplaudan la torta!','¡Que soplen la vela!','¡Prendan la vela!','¡La mordida! ¡La mordida!','¡Que repartan la torta!'];
+    const despedida = ['¡Gracias por su cariño!','¡Han sido un público hermoso!','¡Hasta pronto!','¡Nos vemos, familia bonita!','¡Buenas noches!','¡Gracias por invitarnos!','¡Viva el amor!','¡Viva la festejada!','¡Se despiden Los Coyotes!','¡Hasta la próxima fiesta!'];
+    const saludo = ['¡Muy buenas noches!','¡Bienvenidos!','¡Cómo está mi gente bonita!','¡Arriba las palmas!','¡Aplauso para los anfitriones!','¡Fuerte ese grito!','¡Listos para cantar!','¡Llegó el mariachi!','¡Somos Los Coyotes!','¡Ajusten las gargantas!'];
+    await addMany(cumple,'Cumpleaños','#ffcc33');
+    await addMany(brindis,'Brindis','#72e5ff');
+    await addMany(torta,'Torta','#ff6b6b');
+    await addMany(despedida,'Despedida','#a78bfa');
+    await addMany(saludo,'Saludo','#34d399');
+    alert('Paquete inicial (50) agregado. Ahora puedes editar cada botón y sustituir el audio por el tuyo.');
+    await refresh();
+    console.log('[seed50] done');
+  }catch(err){
+    console.error('[seed50] error', err);
+    alert('No se pudo cargar el paquete inicial. Detalle en consola.');
   }
+}
   const silent = makeSilentWav(0.5);
   const addMany = async (labels, category, color)=>{
     for(const label of labels){
@@ -337,7 +364,19 @@ function attachPadHandlers(pad, s){
 
 // --- Eventos UI ---
 addEventListener('DOMContentLoaded', async ()=>{
-  await openDB();
+  try{
+    await openDB();
+    await refresh();
+    cutMode.checked = localStorage.getItem('cutMode')==='1';
+    volume.value = localStorage.getItem('volume')||'1';
+    // cargar ajustes de edición
+    editModeSel.value = editMode;
+    longPressSlider.value = String(longPressMs);
+  }catch(err){
+    console.error('[init] error', err);
+    alert('Hubo un problema inicializando la app. Prueba el botón "Reset app".');
+  }
+});
   await refresh();
   cutMode.checked = localStorage.getItem('cutMode')==='1';
   volume.value = localStorage.getItem('volume')||'1';
@@ -419,6 +458,7 @@ async function exportBackup(){
 
 document.getElementById('exportBtn').onclick=exportBackup;
 document.getElementById('seed50').onclick=seedInitialPackage;
+document.getElementById('resetApp').onclick=resetApp;
 
 document.getElementById('importBackupBtn').onclick=()=>document.getElementById('backupFile').click();
 
@@ -434,6 +474,32 @@ document.getElementById('backupFile').onchange=async (e)=>{
   }catch(err){ alert('No se pudo importar el respaldo'); }
   e.target.value='';
 };
+
+async function resetApp(){
+  try{
+    // 1) Cerrar y borrar IndexedDB
+    if(db){ db.close && db.close(); }
+    await new Promise((res,rej)=>{
+      const del = indexedDB.deleteDatabase('mariachi-soundboard-v1');
+      del.onsuccess=()=>res(); del.onerror=()=>res(); del.onblocked=()=>res();
+    });
+    // 2) Limpiar caches (Service Worker)
+    if('caches' in self){
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k=>caches.delete(k)));
+    }
+    // 3) Desregistrar SW
+    if('serviceWorker' in navigator){
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r=>r.unregister()));
+    }
+    alert('App reseteada. Se recargará.');
+    location.reload();
+  }catch(err){
+    console.error('[resetApp] error', err);
+    alert('No se pudo resetear completamente. Intenta cerrar todas las pestañas y abrir de nuevo.');
+  }
+}
 
 // Borrar con confirmación desde editor de prompt (long-press abre editor, pero agregamos atajo)
 addEventListener('keydown', async (e)=>{
