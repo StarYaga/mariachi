@@ -1,5 +1,5 @@
 // sw.js — Mariachi Soundboard PWA
-const VERSION = "mariachi-v6";
+const VERSION = "mariachi-v10";
 const BASE = "/mariachi/"; // ¡Importante! Ruta base en GitHub Pages
 
 // Archivos que precacheamos para abrir offline
